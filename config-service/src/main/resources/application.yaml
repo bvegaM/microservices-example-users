@@ -6,7 +6,7 @@ spring:
     config:
       server:
         git:
-          default-label: gateway
+          default-label: auth-service
           uri: https://github.com/bvegaM/microservices-example-users
           search-paths: config-data
   application:
