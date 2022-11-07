@@ -7,6 +7,7 @@ import com.example.auth.service.security.JwtProvider;
 import com.example.auth.service.service.AuthUserServiceImpl;
 import com.example.auth.service.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,7 +41,7 @@ public class AuthUserController {
             String jwt = jwtUtil.createToken(userDetails);
             return ResponseEntity.ok().body(TokenDto.builder().jwt(jwt).build());
         }catch (BadCredentialsException e){
-            return ResponseEntity.badRequest().body(null);
+            return new ResponseEntity<>(TokenDto.builder().jwt("Bad Credentials").build(),HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -53,7 +54,7 @@ public class AuthUserController {
             }
             return ResponseEntity.ok().body(tokenDto);
         }catch (Exception e){
-            return ResponseEntity.badRequest().body(null);
+            return new ResponseEntity<>(TokenDto.builder().jwt("Token not valid!!").build(),HttpStatus.FORBIDDEN);
         }
     }
 
