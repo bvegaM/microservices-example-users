@@ -16,6 +16,7 @@ import java.util.Date;
 public class HistoryDto {
 
     private String request;
+    private String method;
     @JsonFormat(pattern = "yyy-MM-dd")
     private Date dateRequest;
     private String username;

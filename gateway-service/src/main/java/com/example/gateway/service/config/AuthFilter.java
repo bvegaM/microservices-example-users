@@ -23,24 +23,30 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
 
     @Override
     public GatewayFilter apply(Config config) {
+        try{
+            return ((((exchange, chain) -> {
+                if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
+                    return onError(exchange,HttpStatus.UNAUTHORIZED);
+                String tokenHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+                String [] chunks = tokenHeader.split(" ");
+                if(chunks.length != 2 || !chunks[0].equals("Bearer"))
+                    return onError(exchange,HttpStatus.FORBIDDEN);
+                return webClient.build()
+                        .post()
+                        .uri("http://auth-service/auth/validate?token="+chunks[1])
+                        .retrieve()
+                        .onStatus(HttpStatus::isError, clientResponse -> Mono.error(Exception::new))
+                        .bodyToMono(TokenDto.class)
+                        .map(t -> {
+                            t.getToken();
+                            return exchange;
+                        }).flatMap(chain::filter);
 
-        return ((((exchange, chain) -> {
-            if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
-                return onError(exchange,HttpStatus.UNAUTHORIZED);
-            String tokenHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-            String [] chunks = tokenHeader.split(" ");
-            if(chunks.length != 2 || !chunks[0].equals("Bearer"))
-                return onError(exchange,HttpStatus.FORBIDDEN);
-            return webClient.build()
-                    .post()
-                    .uri("http://auth-service/auth/validate?token="+chunks[1])
-                    .retrieve().bodyToMono(TokenDto.class)
-                    .map(t -> {
-                        t.getToken();
-                        return exchange;
-                    }).flatMap(chain::filter);
+            })));
+        }catch (Exception e){
+            return ((((exchange, chain) -> onError(exchange,HttpStatus.FORBIDDEN))));
+        }
 
-        })));
     }
 
     public Mono<Void> onError(ServerWebExchange exchange, HttpStatus status){

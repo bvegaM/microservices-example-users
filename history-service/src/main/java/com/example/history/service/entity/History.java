@@ -23,12 +23,14 @@ public class History {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String request;
+    private String method;
     private Date dateRequest;
     private String username;
 
 
     public static HistoryDto convertDto(History history){
         return HistoryDto.builder().request(history.getRequest())
+                .method(history.getMethod())
                 .dateRequest(history.getDateRequest())
                 .username(history.getUsername()).build();
     }

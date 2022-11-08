@@ -36,6 +36,7 @@ public class HistoryServiceImpl implements HistoryService{
     public HistoryDto save(HistoryDto historyDto) {
         return History.convertDto(historyCrudRepository.save(
                 History.builder().request(historyDto.getRequest())
+                        .method(historyDto.getMethod())
                         .dateRequest(historyDto.getDateRequest())
                         .username(historyDto.getUsername()).build()
         ));
