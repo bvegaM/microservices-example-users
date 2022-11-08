@@ -19,10 +19,9 @@ spring:
                 - id: history-service
                   uri: lb://history-service
                   predicates:
-                    - Path=/historiesWs/history/**
-                    filters:
+                    - Path=/historiesWs/**
+                  filters:
                     - AuthFilter
-                    - Path=/historiesWs/swagger-ui/**
                   
                 - id: auth-service
                   uri: lb://auth-service
